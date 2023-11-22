@@ -9,7 +9,10 @@
     "build": "tsc"
   },
   "keywords": [
-    "js-object-mapper"
+    "js-object-mapper",
+    "js-mapper-object",
+    "mapper",
+    "object mapper"
   ],
   "author": "Slobodan Jovanovski",
   "license": "ISC",
