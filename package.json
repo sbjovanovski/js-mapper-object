@@ -1,0 +1,19 @@
+{
+  "name": "js-object-mapper",
+  "version": "1.0.0",
+  "description": "Convert and map object into a new object with custom keys",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [
+    "js-object-mapper"
+  ],
+  "author": "Slobodan Jovanovski",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.3.2"
+  }
+}
