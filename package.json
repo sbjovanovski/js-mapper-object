@@ -1,5 +1,5 @@
 {
-  "name": "js-object-mapper",
+  "name": "js-mapper-object",
   "version": "1.0.0",
   "description": "Convert and map object into a new object with custom keys",
   "main": "dist/index.js",
