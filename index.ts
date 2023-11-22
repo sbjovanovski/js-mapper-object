@@ -1,4 +1,11 @@
-class Mapper<SourceType, DestinationType> {
+type NestedKeyOf<ObjectType extends object> =
+    {
+        [Key in keyof ObjectType & (string | number)]: ObjectType[Key] extends object
+        ? `${Key}` | `${Key}.${NestedKeyOf<ObjectType[Key]>}`
+        : `${Key}`
+    }[keyof ObjectType & (string | number)];
+
+class Mapper<SourceType extends object, DestinationType> {
     destinationObj: DestinationType = {} as DestinationType
     sourceObj: SourceType
 
@@ -10,7 +17,9 @@ class Mapper<SourceType, DestinationType> {
         return obj === Object(obj)
     }
 
-    map(sKey: string, dKey: keyof DestinationType | Record<keyof DestinationType, (value: any) => void>) {
+    map<SKey extends Extract<keyof SourceType, string>>(sKey: SKey | NestedKeyOf<SourceType>, dKey: string | {
+        [key: string]: (value: SourceType[SKey] & NestedKeyOf<SourceType>) => any
+    }) {
         if (typeof dKey === "string") {
             const sourceValue = this.getSourcePropertyValue(sKey)
             this.setDestinationPropertyValue(dKey, sourceValue)
@@ -26,12 +35,14 @@ class Mapper<SourceType, DestinationType> {
         return this
     }
 
-    mapJoin(sKeys: string[], dKey: keyof DestinationType | Record<keyof DestinationType, (value: any) => void>, joinBy: string = " ") {
+    mapJoin<SKeys extends Extract<keyof SourceType, string>[]>(sKeys: SKeys[] | NestedKeyOf<SourceType>[], dKey: string | {
+        [key: string]: (value: string) => any
+    }, joinBy?: string) {
         if (sKeys.length === 0) {
             throw new Error("Source keys must be a valid list of keys!")
         } else {
             const joinedSourceValue = sKeys.reduce((acc, targetSourceKey, i): string => {
-                const sourcePropertyValue = this.getSourcePropertyValue(targetSourceKey) as string
+                const sourcePropertyValue = this.getSourcePropertyValue(targetSourceKey as string) as string
                 return i === 0 ? sourcePropertyValue : acc + joinBy + sourcePropertyValue
             }, '')
 
@@ -64,10 +75,10 @@ class Mapper<SourceType, DestinationType> {
         return prevObject
     }
 
-    private setDestinationPropertyValue(property: keyof DestinationType, value: unknown) {
+    private setDestinationPropertyValue(property: string, value: unknown) {
         const destinationKeys = property.toString().split('.')
         if (destinationKeys.length === 1) {
-            this.destinationObj[property] = <DestinationType[keyof DestinationType]>value
+            this.destinationObj[property as keyof DestinationType] = <DestinationType[keyof DestinationType]>value
         } else {
             let currentObject = this.destinationObj
             for (let i = 0; i < destinationKeys.length - 1; i++) {
@@ -94,7 +105,7 @@ class Mapper<SourceType, DestinationType> {
             if (typeof processFunction !== 'function') {
                 throw new Error('The value of the destination object key must be a valid function')
             } else {
-                this.setDestinationPropertyValue(key as keyof DestinationType, processFunction(value))
+                this.setDestinationPropertyValue(key, processFunction(value))
             }
         }
     }
