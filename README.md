@@ -38,7 +38,16 @@ interface NewObjectTypes {
     legalName: string
     fullName: string
     dateOfBirth: string
-    fullAddress: string
+    address: {
+        street: {
+            name: string
+        }
+    }
+    full: {
+        address: string
+    }
+    street: string
+    zip: string
 }
 
 const newObject = new Mapper<OriginalObjectTypes, NewObjectTypes>(originalObject)
@@ -50,6 +59,7 @@ const newObject = new Mapper<OriginalObjectTypes, NewObjectTypes>(originalObject
     .map('birthdate', {
         'dateOfBirth': (value: Date) => value.toDateString()
     })
+    .map('address.street', 'address.street.name')
     .mapJoin([
         'address.street',
         'address.zipcode',
@@ -57,7 +67,6 @@ const newObject = new Mapper<OriginalObjectTypes, NewObjectTypes>(originalObject
     ], {
         'full.address': (value: string) => value
     }, ',')
-    .map('address.street', 'street.name')
     .map('address.street', 'street')
     .map('address.zipcode', {'zip': (value: string) => value})
     .destinationObj
@@ -65,8 +74,9 @@ const newObject = new Mapper<OriginalObjectTypes, NewObjectTypes>(originalObject
 // newObject
 {
   legalName: 'John',
-  fullName: 'John Doe',
+  fullName: 'JohnundefinedDoe',
   dateOfBirth: 'Fri Jul 21 1989',
+  address: { street: { name: 'Ajax Block street' } },
   full: { address: 'Ajax Block street,123456,Toronto' },
   street: 'Ajax Block street',
   zip: '123456'
